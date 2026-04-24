@@ -1,30 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pedro Sigismundo · Vision AI</title>
+  <title>Pedro Sigismundo · Gesture AI</title>
 
-  <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
-  <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
 
   <style>
     :root {
-      --bg:        #050810;
-      --surface:   #0d1120;
-      --border:    #1e2a44;
-      --accent:    #00f5c8;
-      --accent2:   #7b5cfa;
-      --text:      #e8eaf6;
-      --muted:     #5c6b8a;
-      --glow:      0 0 28px rgba(0,245,200,.35);
-      --glow2:     0 0 28px rgba(123,92,250,.35);
+      --bg:       #04060f;
+      --surface:  #090d1c;
+      --border:   #182035;
+      --accent:   #00e5b8;
+      --violet:   #7b5cfa;
+      --rose:     #ff4d7d;
+      --amber:    #ffb830;
+      --text:     #dde4f5;
+      --muted:    #4a5878;
+      --r-pos:    #00e5b8;
+      --r-neg:    #ff4d7d;
+      --r-fist:   #7b5cfa;
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -35,303 +34,647 @@
       overflow-x: hidden;
     }
 
-    /* ── Noise overlay ── */
     body::before {
       content: '';
-      position: fixed; inset: 0; z-index: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 55% at 10% 15%,  rgba(123,92,250,.12) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 45% at 90% 85%,  rgba(0,229,184,.10)  0%, transparent 70%),
+        radial-gradient(ellipse 40% 35% at 80% 10%,  rgba(255,77,125,.08) 0%, transparent 70%);
     }
 
-    /* ── Ambient blobs ── */
-    .blob {
-      position: fixed; border-radius: 50%; filter: blur(120px);
-      opacity: .18; pointer-events: none; z-index: 0;
+    /* ── Top bar ── */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 1.6rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(9,13,28,.65);
+      backdrop-filter: blur(14px);
+      position: sticky; top: 0; z-index: 100;
     }
-    .blob-1 { width: 520px; height: 520px; background: var(--accent2); top: -120px; left: -120px; animation: drift 14s ease-in-out infinite alternate; }
-    .blob-2 { width: 400px; height: 400px; background: var(--accent);  bottom: -80px;  right: -80px;  animation: drift 18s ease-in-out infinite alternate-reverse; }
-    @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,40px) scale(1.1); } }
-
-    /* ── Layout ── */
-    .wrapper {
-      position: relative; z-index: 1;
-      min-height: 100vh;
-      display: flex; flex-direction: column; align-items: center;
-      padding: 2.5rem 1rem 3rem;
-      gap: 2rem;
-    }
-
-    /* ── Header ── */
-    header { text-align: center; }
-    .eyebrow {
-      font-family: 'Space Mono', monospace;
-      font-size: .72rem; letter-spacing: .22em; text-transform: uppercase;
-      color: var(--accent); opacity: .85;
-    }
-    h1 {
-      font-size: clamp(2rem, 6vw, 3.6rem);
-      font-weight: 800; line-height: 1.05;
-      background: linear-gradient(120deg, #fff 30%, var(--accent));
+    .topbar-logo {
+      font-weight: 800; font-size: 1.05rem;
+      background: linear-gradient(120deg, #fff 40%, var(--accent));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      margin-top: .4rem;
     }
-    .subtitle {
-      font-family: 'Space Mono', monospace;
-      font-size: .78rem; color: var(--muted); margin-top: .6rem; letter-spacing: .05em;
+    .topbar-badge {
+      font-family: 'Space Mono', monospace; font-size: .62rem;
+      letter-spacing: .18em; text-transform: uppercase;
+      color: var(--accent); opacity: .8;
+      border: 1px solid rgba(0,229,184,.25); padding: .22rem .6rem; border-radius: 999px;
+      display: flex; align-items: center; gap: .4rem;
+    }
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--muted);
+      animation: blink 1.4s ease-in-out infinite;
+      transition: background .4s;
+    }
+    .live-dot.active { background: var(--accent); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* ── Page wrapper ── */
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100vh; display: flex; flex-direction: column;
+      padding-bottom: 2.5rem;
     }
 
-    /* ── Card ── */
-    .card-glass {
-      background: rgba(13,17,32,.78);
+    .main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.4rem;
+      padding: 1.6rem 1.1rem;
+      max-width: 1080px; width: 100%; margin: 0 auto;
+    }
+    @media(min-width: 768px) {
+      .main { grid-template-columns: 1fr 1fr; align-items: start; }
+    }
+    @media(min-width: 1024px) {
+      .main { grid-template-columns: 1.15fr 1fr; padding: 2rem 1.8rem; }
+    }
+
+    /* ── Glass card ── */
+    .glass {
+      background: rgba(9,13,28,.78);
       border: 1px solid var(--border);
-      border-radius: 20px;
+      border-radius: 18px;
       backdrop-filter: blur(18px);
-      padding: 2rem;
-      width: 100%; max-width: 480px;
-      box-shadow: 0 8px 40px rgba(0,0,0,.5);
+      padding: 1.5rem;
+      box-shadow: 0 12px 48px rgba(0,0,0,.4);
     }
 
-    /* ── Start Button ── */
+    .sec-label {
+      font-family: 'Space Mono', monospace; font-size: .6rem;
+      letter-spacing: .2em; text-transform: uppercase; color: var(--muted);
+      display: flex; align-items: center; gap: .5rem; margin-bottom: 1rem;
+    }
+    .sec-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* ── Button ── */
     .btn-start {
       position: relative; overflow: hidden;
-      display: inline-flex; align-items: center; gap: .55rem;
-      padding: .85rem 2.2rem;
-      font-family: 'Space Mono', monospace; font-size: .9rem; font-weight: 700;
-      letter-spacing: .06em; text-transform: uppercase;
-      color: var(--bg);
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none; border-radius: 50px;
-      cursor: pointer;
-      box-shadow: var(--glow);
+      width: 100%; padding: .9rem 1.4rem; margin-bottom: 1.3rem;
+      display: inline-flex; align-items: center; justify-content: center; gap: .6rem;
+      font-family: 'Space Mono', monospace; font-size: .82rem; font-weight: 700;
+      letter-spacing: .07em; text-transform: uppercase;
+      color: #04060f;
+      background: linear-gradient(135deg, var(--accent), var(--violet));
+      border: none; border-radius: 12px; cursor: pointer;
       transition: transform .2s, box-shadow .2s;
-      animation: pulse-ring 2.4s ease-in-out infinite;
+      animation: pulse-glow 2.5s ease-in-out infinite;
     }
-    .btn-start:hover  { transform: translateY(-3px) scale(1.03); box-shadow: 0 0 48px rgba(0,245,200,.55); }
-    .btn-start:active { transform: translateY(0) scale(.98); }
-    .btn-start::after {
-      content: ''; position: absolute; inset: 0; border-radius: inherit;
-      background: linear-gradient(135deg, rgba(255,255,255,.25), transparent);
-      opacity: 0; transition: opacity .2s;
-    }
-    .btn-start:hover::after { opacity: 1; }
+    .btn-start:disabled { opacity: .55; cursor: not-allowed; animation: none; pointer-events: none; }
+    .btn-start:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 0 36px rgba(0,229,184,.5); }
+    .btn-start:not(:disabled):active { transform: scale(.98); }
 
-    @keyframes pulse-ring {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(0,245,200,.45), var(--glow); }
-      50%       { box-shadow: 0 0 0 14px rgba(0,245,200,0), var(--glow); }
+    .btn-start .shimmer {
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,.2) 50%, transparent 70%);
+      transform: translateX(-100%);
+      animation: shimmer 2.6s ease-in-out infinite;
     }
-
-    .btn-start.started {
-      background: linear-gradient(135deg, #1e2a44, #0d1120);
-      color: var(--accent); box-shadow: none; animation: none;
-      border: 1px solid var(--border);
+    @keyframes shimmer { 0%{transform:translateX(-100%)} 60%,100%{transform:translateX(150%)} }
+    @keyframes pulse-glow {
+      0%,100%{ box-shadow:0 0 0 0 rgba(0,229,184,.5),0 4px 20px rgba(0,229,184,.25); }
+      50%    { box-shadow:0 0 0 10px rgba(0,229,184,0),0 4px 20px rgba(0,229,184,.1); }
     }
-
-    /* spinner inside button */
-    .spin { display: none; width: 16px; height: 16px; border: 2px solid rgba(0,0,0,.3); border-top-color: var(--bg); border-radius: 50%; animation: spin .7s linear infinite; }
-    .loading .spin { display: block; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── Webcam container ── */
-    #webcam-container {
-      display: flex; justify-content: center;
-      margin-top: 1.5rem;
+    .btn-start.active-state {
+      background: rgba(255,255,255,.04); color: var(--accent);
+      border: 1px solid rgba(0,229,184,.3); animation: none; box-shadow: none;
     }
-    #webcam-container canvas {
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      box-shadow: var(--glow2);
-      width: 100% !important; max-width: 320px; height: auto !important;
-      display: block;
+    .btn-spinner {
+      width: 15px; height: 15px;
+      border: 2px solid rgba(0,0,0,.25); border-top-color: #04060f;
+      border-radius: 50%; animation: spin .7s linear infinite; display: none;
     }
+    .loading .btn-spinner { display: block; }
+    @keyframes spin { to{transform:rotate(360deg)} }
 
-    /* scan line animation over webcam */
-    .cam-wrap { position: relative; display: inline-block; max-width: 320px; width: 100%; }
-    .cam-wrap::after {
-      content: '';
-      position: absolute; left: 0; right: 0; top: 0; height: 3px;
+    /* ── Webcam ── */
+    .cam-outer {
+      position: relative; border-radius: 14px; overflow: hidden;
+      border: 2px solid var(--border); background: #000;
+      aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color .4s, box-shadow .4s;
+    }
+    .cam-outer.detected-pos  { border-color: var(--r-pos);  box-shadow: 0 0 28px rgba(0,229,184,.35); }
+    .cam-outer.detected-neg  { border-color: var(--r-neg);  box-shadow: 0 0 28px rgba(255,77,125,.35); }
+    .cam-outer.detected-fist { border-color: var(--r-fist); box-shadow: 0 0 28px rgba(123,92,250,.35); }
+
+    #webcam-container { width:100%; height:100%; display:none; }
+    #webcam-container canvas { width:100%!important; height:100%!important; object-fit:cover; display:block; }
+
+    /* scan line */
+    .cam-outer.scanning::after {
+      content:''; position:absolute; left:0; right:0; top:0; height:2px; pointer-events:none;
       background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      animation: scan 2.8s ease-in-out infinite;
-      border-radius: 2px; pointer-events: none;
+      animation: scan 3s ease-in-out infinite;
     }
-    @keyframes scan { 0% { top: 0; opacity: .9; } 100% { top: 100%; opacity: 0; } }
+    @keyframes scan { 0%{top:0;opacity:.8} 95%{top:100%;opacity:0} 100%{top:0;opacity:0} }
 
-    /* ── Labels / Progress bars ── */
-    #label-container { margin-top: 1.8rem; display: flex; flex-direction: column; gap: .9rem; }
+    /* corner decorations */
+    .corner { position:absolute; width:16px; height:16px; border-color:rgba(0,229,184,.5); border-style:solid; }
+    .corner-tl { top:7px; left:7px;   border-width:2px 0 0 2px; }
+    .corner-tr { top:7px; right:7px;  border-width:2px 2px 0 0; }
+    .corner-bl { bottom:7px; left:7px;  border-width:0 0 2px 2px; }
+    .corner-br { bottom:7px; right:7px; border-width:0 2px 2px 0; }
 
-    .label-row { display: flex; flex-direction: column; gap: .35rem; }
-
-    .label-header {
-      display: flex; justify-content: space-between; align-items: center;
+    .cam-placeholder {
+      display:flex; flex-direction:column; align-items:center; gap:.8rem;
+      color:var(--muted); font-family:'Space Mono',monospace; font-size:.7rem; text-align:center; padding:2rem;
     }
+    .cam-placeholder i { font-size:2.2rem; opacity:.3; }
+
+    /* ── Error banner ── */
+    .err-toast {
+      display:none; align-items:center; gap:.7rem;
+      background:rgba(255,77,125,.1); border:1px solid rgba(255,77,125,.3);
+      border-radius:10px; padding:.7rem .9rem;
+      font-family:'Space Mono',monospace; font-size:.68rem; color:var(--rose);
+      margin-bottom:.9rem;
+    }
+    .err-toast.show { display:flex; }
+
+    /* ── Gesture display ── */
+    .gesture-display {
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:.45rem; padding:1.3rem 1rem;
+      border-radius:14px; border:1px solid var(--border);
+      background:rgba(4,6,15,.5); min-height:128px;
+      margin-bottom:1.2rem;
+      transition: border-color .4s, background .4s, box-shadow .4s;
+    }
+    .gesture-display.detected-pos  { border-color:var(--r-pos);  background:rgba(0,229,184,.07);  box-shadow:0 0 24px rgba(0,229,184,.12); }
+    .gesture-display.detected-neg  { border-color:var(--r-neg);  background:rgba(255,77,125,.07); box-shadow:0 0 24px rgba(255,77,125,.12); }
+    .gesture-display.detected-fist { border-color:var(--r-fist); background:rgba(123,92,250,.07); box-shadow:0 0 24px rgba(123,92,250,.12); }
+
+    .gesture-emoji {
+      font-size:3.4rem; line-height:1;
+      filter:grayscale(1) opacity(.2);
+      transition: filter .3s, transform .3s;
+    }
+    .gesture-emoji.active {
+      filter:none;
+      transform:scale(1.16);
+      animation: pop .38s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes pop { 0%{transform:scale(.7)} 60%{transform:scale(1.25)} 100%{transform:scale(1.16)} }
+
+    .gesture-name {
+      font-weight:800; font-size:1.1rem; letter-spacing:.02em; transition:color .3s;
+    }
+    .gesture-conf {
+      font-family:'Space Mono',monospace; font-size:.65rem; color:var(--muted);
+    }
+
+    /* ── Progress bars ── */
+    .label-list { display:flex; flex-direction:column; gap:.8rem; margin-bottom:1.2rem; }
+    .label-row  { display:flex; flex-direction:column; gap:.28rem; }
+    .label-head { display:flex; justify-content:space-between; align-items:center; }
+    .label-left { display:flex; align-items:center; gap:.4rem; }
+    .label-emoji{ font-size:.95rem; }
     .label-name {
-      font-family: 'Space Mono', monospace; font-size: .75rem;
-      text-transform: uppercase; letter-spacing: .1em; color: var(--text);
+      font-family:'Space Mono',monospace; font-size:.67rem;
+      text-transform:uppercase; letter-spacing:.1em; color:var(--text);
     }
-    .label-pct {
-      font-family: 'Space Mono', monospace; font-size: .75rem;
-      color: var(--accent); font-weight: 700; min-width: 3ch; text-align: right;
+    .label-pct  {
+      font-family:'Space Mono',monospace; font-size:.67rem;
+      font-weight:700; min-width:4.5ch; text-align:right; transition:color .3s;
     }
+    .progress-track { height:7px; background:rgba(255,255,255,.05); border-radius:999px; overflow:hidden; }
+    .progress-fill  { height:100%; border-radius:999px; width:0%; transition:width .28s cubic-bezier(.4,0,.2,1); }
+    .fill-pos  { background:linear-gradient(90deg, rgba(0,229,184,.4), var(--r-pos)); box-shadow:0 0 8px rgba(0,229,184,.3); }
+    .fill-neg  { background:linear-gradient(90deg, rgba(255,77,125,.4), var(--r-neg)); box-shadow:0 0 8px rgba(255,77,125,.3); }
+    .fill-fist { background:linear-gradient(90deg, rgba(123,92,250,.4), var(--r-fist)); box-shadow:0 0 8px rgba(123,92,250,.3); }
+    .fill-def  { background:linear-gradient(90deg, rgba(74,88,120,.4), var(--muted)); }
 
-    .progress-track {
-      height: 8px; background: var(--border); border-radius: 999px; overflow: hidden;
+    /* ── Counters ── */
+    .counters { display:grid; grid-template-columns:repeat(3,1fr); gap:.6rem; margin-bottom:1.2rem; }
+    .counter-cell {
+      display:flex; flex-direction:column; align-items:center; gap:.25rem;
+      padding:.7rem .4rem;
+      border-radius:12px; border:1px solid var(--border); background:rgba(4,6,15,.4);
+      transition: border-color .3s, background .3s;
     }
-    .progress-fill {
-      height: 100%; border-radius: 999px; width: 0%;
-      background: linear-gradient(90deg, var(--accent2), var(--accent));
-      transition: width .35s cubic-bezier(.4,0,.2,1);
-      box-shadow: 0 0 10px rgba(0,245,200,.4);
+    .counter-cell.c-pos  { border-color:rgba(0,229,184,.25);  background:rgba(0,229,184,.05);  }
+    .counter-cell.c-neg  { border-color:rgba(255,77,125,.25); background:rgba(255,77,125,.05); }
+    .counter-cell.c-fist { border-color:rgba(123,92,250,.25); background:rgba(123,92,250,.05); }
+    .counter-cell.flash  { animation:counter-flash .45s ease; }
+    @keyframes counter-flash { 0%{transform:scale(1)} 45%{transform:scale(1.13)} 100%{transform:scale(1)} }
+    .counter-emoji { font-size:1.25rem; }
+    .counter-val   { font-family:'Space Mono',monospace; font-size:1.05rem; font-weight:700; }
+    .counter-lbl   { font-size:.58rem; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; }
+
+    /* ── History ── */
+    .history-strip { display:flex; gap:.4rem; flex-wrap:wrap; min-height:2rem; }
+    .hist-chip {
+      font-size:1.05rem;
+      background:rgba(255,255,255,.05); border:1px solid var(--border);
+      border-radius:8px; padding:.24rem .44rem;
+      animation:fadeIn .28s ease;
     }
+    @keyframes fadeIn { from{opacity:0;transform:scale(.65)} to{opacity:1;transform:scale(1)} }
+    .no-history { font-family:'Space Mono',monospace; font-size:.62rem; color:var(--muted); }
 
     /* ── Footer ── */
     footer {
-      font-family: 'Space Mono', monospace; font-size: .68rem;
-      color: var(--muted); text-align: center; letter-spacing: .06em;
+      text-align:center; padding:1rem 1rem 0;
+      font-family:'Space Mono',monospace; font-size:.6rem;
+      color:var(--muted); letter-spacing:.06em;
     }
-    footer a { color: var(--accent); text-decoration: none; }
-
-    /* ── Responsive tweaks ── */
-    @media (min-width: 600px) {
-      .card-glass { padding: 2.5rem; }
-    }
+    footer a { color:var(--accent); text-decoration:none; }
   </style>
 </head>
 <body>
 
-<div class="blob blob-1"></div>
-<div class="blob blob-2"></div>
+<div class="page">
 
-<div class="wrapper">
+  <!-- Top bar -->
+  <nav class="topbar">
+    <span class="topbar-logo">Pedro Sigismundo</span>
+    <span class="topbar-badge">
+      <span class="live-dot" id="live-dot"></span>Vision AI
+    </span>
+  </nav>
 
-  <!-- Header -->
-  <header>
-    <p class="eyebrow"><i class="bi bi-cpu"></i> &nbsp;Teachable Machine</p>
-    <h1>Pedro Sigismundo</h1>
-    <p class="subtitle">// vision · classification · real-time</p>
-  </header>
+  <div class="main">
 
-  <!-- Main card -->
-  <div class="card-glass">
+    <!-- ── LEFT: Camera ── -->
+    <div class="glass">
+      <p class="sec-label"><i class="bi bi-camera-video"></i> Câmera ao Vivo</p>
 
-    <!-- Button -->
-    <div class="d-flex justify-content-center">
-      <button id="btn-start" class="btn-start" onclick="init()">
-        <span class="spin" id="btn-spin"></span>
+      <div class="err-toast" id="err-toast">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span id="err-msg">Erro ao acessar a câmera.</span>
+      </div>
+
+      <button class="btn-start" id="btn-start" onclick="init()">
+        <span class="shimmer"></span>
+        <span class="btn-spinner" id="btn-spin"></span>
         <i class="bi bi-camera-video-fill" id="btn-icon"></i>
         <span id="btn-label">Ativar Câmera</span>
       </button>
+
+      <div class="cam-outer" id="cam-outer">
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+
+        <div class="cam-placeholder" id="cam-placeholder">
+          <i class="bi bi-hand-index-thumb"></i>
+          <span>Clique em "Ativar Câmera"<br>para iniciar o reconhecimento de gestos</span>
+        </div>
+
+        <div id="webcam-container"></div>
+      </div>
+
+      <p style="font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted);text-align:center;margin-top:.7rem;letter-spacing:.07em;">
+        <i class="bi bi-shield-lock"></i> &nbsp;Processado localmente — sem envio de dados
+      </p>
     </div>
 
-    <!-- Webcam -->
-    <div id="webcam-container">
-      <div class="cam-wrap" id="cam-wrap" style="display:none">
-        <!-- canvas inserted here by JS -->
+    <!-- ── RIGHT: Results ── -->
+    <div class="glass">
+      <p class="sec-label"><i class="bi bi-activity"></i> Detecção em Tempo Real</p>
+
+      <!-- Big gesture card -->
+      <div class="gesture-display" id="gesture-display">
+        <div class="gesture-emoji" id="gesture-emoji">🤔</div>
+        <div class="gesture-name" id="gesture-name" style="color:var(--muted)">Aguardando câmera…</div>
+        <div class="gesture-conf" id="gesture-conf"></div>
+      </div>
+
+      <!-- Progress bars -->
+      <p class="sec-label"><i class="bi bi-bar-chart"></i> Correspondência por Classe</p>
+      <div class="label-list" id="label-container"></div>
+
+      <!-- Counters -->
+      <p class="sec-label"><i class="bi bi-hash"></i> Contagem</p>
+      <div class="counters">
+        <div class="counter-cell" id="cnt-pos">
+          <span class="counter-emoji">👍</span>
+          <span class="counter-val" id="n-pos">0</span>
+          <span class="counter-lbl">Positivo</span>
+        </div>
+        <div class="counter-cell" id="cnt-neg">
+          <span class="counter-emoji">👎</span>
+          <span class="counter-val" id="n-neg">0</span>
+          <span class="counter-lbl">Negativo</span>
+        </div>
+        <div class="counter-cell" id="cnt-fist">
+          <span class="counter-emoji">✊</span>
+          <span class="counter-val" id="n-fist">0</span>
+          <span class="counter-lbl">Fechada</span>
+        </div>
+      </div>
+
+      <!-- History -->
+      <p class="sec-label"><i class="bi bi-clock-history"></i> Histórico</p>
+      <div class="history-strip" id="history-strip">
+        <span class="no-history">Nenhum gesto detectado ainda</span>
       </div>
     </div>
 
-    <!-- Progress bars -->
-    <div id="label-container"></div>
-
   </div>
 
-  <!-- Footer -->
   <footer>
-    <p>Powered by <a href="https://teachablemachine.withgoogle.com/" target="_blank">Teachable Machine</a> &amp; TensorFlow.js</p>
+    Powered by <a href="https://teachablemachine.withgoogle.com/" target="_blank">Teachable Machine</a>
+    &amp; <a href="https://www.tensorflow.org/js" target="_blank">TensorFlow.js</a>
+    &nbsp;·&nbsp; Pedro Sigismundo &copy; 2025
   </footer>
 
 </div>
 
-<!-- TensorFlow + Teachable Machine -->
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  const URL = "https://teachablemachine.withgoogle.com/models/ZkZaIQpyWX/";
-  let model, webcam, labelContainer, maxPredictions;
-  let initialized = false;
+/* ── CONFIG ── */
+const MODEL_URL        = "https://teachablemachine.withgoogle.com/models/ZkZaIQpyWX/";
+const CONFIDENCE_THRESHOLD = 0.72;  // min smoothed confidence to lock gesture
+const SMOOTHING_FRAMES     = 6;     // rolling average window (reduces flickering)
+const HOLD_FRAMES          = 8;     // consecutive frames needed to confirm gesture
+const COOLDOWN_FRAMES      = 20;    // frames to wait before counting same gesture again
+const MAX_HISTORY          = 20;
 
-  async function init() {
-    if (initialized) return;
-    initialized = true;
+/* ── GESTURE MAP ──
+   Maps substring patterns in class names → UI metadata.
+   Extend this list if the model has more classes.           */
+const GESTURE_MAP = [
+  {
+    keys:      ['positivo','thumbs up','thumb up','polegar cima','like','yes','joinha'],
+    emoji:     '👍',
+    label:     'Positivo',
+    cssClass:  'detected-pos',
+    fillClass: 'fill-pos',
+    color:     'var(--r-pos)',
+    cntId:     'cnt-pos',
+    cntVal:    'n-pos',
+    cntClass:  'c-pos',
+  },
+  {
+    keys:      ['negativo','thumbs down','thumb down','polegar baixo','unlike','no','dislike'],
+    emoji:     '👎',
+    label:     'Negativo',
+    cssClass:  'detected-neg',
+    fillClass: 'fill-neg',
+    color:     'var(--r-neg)',
+    cntId:     'cnt-neg',
+    cntVal:    'n-neg',
+    cntClass:  'c-neg',
+  },
+  {
+    keys:      ['fechada','fist','punho','closed','punched','mão fechada','fecho'],
+    emoji:     '✊',
+    label:     'Mão Fechada',
+    cssClass:  'detected-fist',
+    fillClass: 'fill-fist',
+    color:     'var(--r-fist)',
+    cntId:     'cnt-fist',
+    cntVal:    'n-fist',
+    cntClass:  'c-fist',
+  },
+];
 
-    // Button → loading state
-    const btn      = document.getElementById('btn-start');
-    const btnLabel = document.getElementById('btn-label');
-    const btnIcon  = document.getElementById('btn-icon');
-    const btnSpin  = document.getElementById('btn-spin');
+function resolveGesture(className) {
+  const lower = (className || '').toLowerCase();
+  return GESTURE_MAP.find(g => g.keys.some(k => lower.includes(k))) || null;
+}
 
-    btn.classList.add('loading');
-    btnIcon.style.display = 'none';
-    btnSpin.style.display = 'block';
-    btnLabel.textContent  = 'Carregando…';
-    btn.disabled = true;
+/* ── STATE ── */
+let model, webcam, maxPredictions;
+let initialized = false;
+let smoothBuf   = [];          // per-class rolling buffers
+let holdCount   = 0;
+let holdGesture = null;
+let confirmedGesture = null;
+let cooldown    = 0;
+const counts    = { 'n-pos': 0, 'n-neg': 0, 'n-fist': 0 };
+const history   = [];
 
-    try {
-      model = await tmImage.load(URL + "model.json", URL + "metadata.json");
-      maxPredictions = model.getTotalClasses();
+/* ── INIT ── */
+async function init() {
+  if (initialized) return;
+  initialized = true;
 
-      const flip = true;
-      webcam = new tmImage.Webcam(320, 320, flip);
-      await webcam.setup();
-      await webcam.play();
-      window.requestAnimationFrame(loop);
+  const btn   = document.getElementById('btn-start');
+  const bIcon = document.getElementById('btn-icon');
+  const bSpin = document.getElementById('btn-spin');
+  const bLbl  = document.getElementById('btn-label');
+  const errEl = document.getElementById('err-toast');
 
-      // Show canvas inside cam-wrap
-      const wrap = document.getElementById('cam-wrap');
-      wrap.style.display = 'inline-block';
-      wrap.appendChild(webcam.canvas);
+  btn.classList.add('loading');
+  bIcon.style.display = 'none';
+  bSpin.style.display = 'block';
+  bLbl.textContent    = 'Carregando modelo…';
+  btn.disabled = true;
+  errEl.classList.remove('show');
 
-      // Build progress rows
-      labelContainer = document.getElementById("label-container");
-      labelContainer.innerHTML = '';
-      for (let i = 0; i < maxPredictions; i++) {
-        const row = document.createElement('div');
-        row.className = 'label-row';
-        row.innerHTML = `
-          <div class="label-header">
-            <span class="label-name" id="lname-${i}">Classe ${i + 1}</span>
-            <span class="label-pct" id="lpct-${i}">0%</span>
-          </div>
-          <div class="progress-track">
-            <div class="progress-fill" id="lbar-${i}"></div>
-          </div>`;
-        labelContainer.appendChild(row);
-      }
+  try {
+    /* 1. Model */
+    model = await tmImage.load(MODEL_URL + "model.json", MODEL_URL + "metadata.json");
+    maxPredictions = model.getTotalClasses();
+    smoothBuf = Array.from({ length: maxPredictions }, () => []);
 
-      // Button → active state
-      btn.classList.remove('loading');
-      btn.classList.add('started');
-      btnSpin.style.display = 'none';
-      btnIcon.className = 'bi bi-stop-circle';
-      btnIcon.style.display = 'inline';
-      btnLabel.textContent = 'Câmera Ativa';
+    /* 2. Webcam */
+    bLbl.textContent = 'Acessando câmera…';
+    webcam = new tmImage.Webcam(400, 400, true /* flip */);
+    await webcam.setup();
+    await webcam.play();
 
-    } catch (err) {
-      btn.classList.remove('loading');
-      btnSpin.style.display = 'none';
-      btnIcon.style.display = 'inline';
-      btnLabel.textContent  = 'Erro – Tente Novamente';
-      btn.disabled = false;
-      initialized = false;
-      console.error(err);
-    }
-  }
+    /* 3. Mount canvas */
+    const wc = document.getElementById('webcam-container');
+    document.getElementById('cam-placeholder').style.display = 'none';
+    wc.style.display = 'block';
+    webcam.canvas.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+    wc.appendChild(webcam.canvas);
+    document.getElementById('cam-outer').classList.add('scanning');
 
-  async function loop() {
-    webcam.update();
-    await predict();
+    /* 4. Build progress bars */
+    buildProgressBars();
+
+    /* 5. Update UI */
+    btn.classList.remove('loading');
+    btn.classList.add('active-state');
+    bSpin.style.display = 'none';
+    bIcon.className     = 'bi bi-record-circle';
+    bIcon.style.display = 'inline';
+    bLbl.textContent    = 'Câmera Ativa';
+    document.getElementById('live-dot').classList.add('active');
+
+    document.getElementById('gesture-emoji').textContent = '🖐';
+    document.getElementById('gesture-name').textContent  = 'Mostre um gesto!';
+    document.getElementById('gesture-name').style.color  = 'var(--text)';
+
     window.requestAnimationFrame(loop);
-  }
 
-  async function predict() {
-    const prediction = await model.predict(webcam.canvas);
-    for (let i = 0; i < maxPredictions; i++) {
-      const pct = (prediction[i].probability * 100).toFixed(1);
-      document.getElementById(`lname-${i}`).textContent = prediction[i].className;
-      document.getElementById(`lpct-${i}`).textContent  = pct + '%';
-      document.getElementById(`lbar-${i}`).style.width  = pct + '%';
-    }
+  } catch (err) {
+    console.error(err);
+    initialized = false;
+    btn.classList.remove('loading');
+    btn.disabled        = false;
+    bSpin.style.display = 'none';
+    bIcon.style.display = 'inline';
+    bLbl.textContent    = 'Tentar Novamente';
+    document.getElementById('err-msg').textContent =
+      err.name === 'NotAllowedError'
+        ? 'Permissão de câmera negada. Permita o acesso e tente novamente.'
+        : err.message || 'Erro ao carregar. Verifique sua conexão e tente novamente.';
+    errEl.classList.add('show');
   }
+}
+
+/* ── BUILD PROGRESS BARS ── */
+function buildProgressBars() {
+  const container = document.getElementById('label-container');
+  container.innerHTML = '';
+  for (let i = 0; i < maxPredictions; i++) {
+    const row = document.createElement('div');
+    row.className = 'label-row';
+    row.innerHTML = `
+      <div class="label-head">
+        <div class="label-left">
+          <span class="label-emoji" id="lemoji-${i}">❓</span>
+          <span class="label-name"  id="lname-${i}">Classe ${i+1}</span>
+        </div>
+        <span class="label-pct" id="lpct-${i}">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill fill-def" id="lbar-${i}"></div>
+      </div>`;
+    container.appendChild(row);
+  }
+}
+
+/* ── LOOP ── */
+async function loop() {
+  webcam.update();
+  await predict();
+  window.requestAnimationFrame(loop);
+}
+
+/* ── PREDICT ── */
+async function predict() {
+  const preds = await model.predict(webcam.canvas);
+
+  /* Smooth */
+  const smoothed = preds.map((p, i) => {
+    smoothBuf[i].push(p.probability);
+    if (smoothBuf[i].length > SMOOTHING_FRAMES) smoothBuf[i].shift();
+    return smoothBuf[i].reduce((a, b) => a + b, 0) / smoothBuf[i].length;
+  });
+
+  /* Progress bars */
+  preds.forEach((p, i) => {
+    const pct = (smoothed[i] * 100).toFixed(1);
+    const g   = resolveGesture(p.className);
+    document.getElementById(`lname-${i}`).textContent  = p.className;
+    document.getElementById(`lpct-${i}`).textContent   = pct + '%';
+    document.getElementById(`lpct-${i}`).style.color   = g ? g.color : 'var(--muted)';
+    document.getElementById(`lemoji-${i}`).textContent = g ? g.emoji : '❓';
+    document.getElementById(`lbar-${i}`).style.width   = pct + '%';
+    document.getElementById(`lbar-${i}`).className     = 'progress-fill ' + (g ? g.fillClass : 'fill-def');
+  });
+
+  /* Top class */
+  let topIdx = 0;
+  smoothed.forEach((v, i) => { if (v > smoothed[topIdx]) topIdx = i; });
+  const topProb = smoothed[topIdx];
+  const topGest = resolveGesture(preds[topIdx].className);
+
+  if (cooldown > 0) { cooldown--; }
+
+  /* Hold logic */
+  if (topGest && topProb >= CONFIDENCE_THRESHOLD) {
+    if (topGest === holdGesture) { holdCount++; }
+    else { holdGesture = topGest; holdCount = 1; }
+
+    if (holdCount >= HOLD_FRAMES) {
+      if (topGest !== confirmedGesture) {
+        confirmGesture(topGest, topProb);
+      } else {
+        // update confidence display
+        document.getElementById('gesture-conf').textContent =
+          `${(topProb * 100).toFixed(0)}% de confiança`;
+      }
+    }
+  } else {
+    holdCount = 0;
+    holdGesture = null;
+    if (confirmedGesture) clearGestureDisplay();
+  }
+}
+
+/* ── CONFIRM ── */
+function confirmGesture(g, prob) {
+  confirmedGesture = g;
+
+  const emojiEl = document.getElementById('gesture-emoji');
+  const nameEl  = document.getElementById('gesture-name');
+  const confEl  = document.getElementById('gesture-conf');
+  const dispEl  = document.getElementById('gesture-display');
+  const camEl   = document.getElementById('cam-outer');
+
+  const allClasses = ['detected-pos','detected-neg','detected-fist'];
+  allClasses.forEach(c => { dispEl.classList.remove(c); camEl.classList.remove(c); });
+
+  emojiEl.classList.remove('active');
+  void emojiEl.offsetWidth;
+  emojiEl.textContent = g.emoji;
+  emojiEl.classList.add('active');
+
+  nameEl.textContent = g.label;
+  nameEl.style.color = g.color;
+  confEl.textContent = `${(prob * 100).toFixed(0)}% de confiança`;
+  dispEl.classList.add(g.cssClass);
+  camEl.classList.add(g.cssClass);
+
+  /* Counter (with cooldown to avoid spam) */
+  if (cooldown === 0) {
+    counts[g.cntVal]++;
+    document.getElementById(g.cntVal).textContent = counts[g.cntVal];
+    const cell = document.getElementById(g.cntId);
+    cell.className = `counter-cell ${g.cntClass}`;
+    cell.classList.remove('flash');
+    void cell.offsetWidth;
+    cell.classList.add('flash');
+    cooldown = COOLDOWN_FRAMES;
+    addHistory(g.emoji);
+  }
+}
+
+/* ── CLEAR ── */
+function clearGestureDisplay() {
+  confirmedGesture = null;
+  const dispEl = document.getElementById('gesture-display');
+  const camEl  = document.getElementById('cam-outer');
+  ['detected-pos','detected-neg','detected-fist'].forEach(c => {
+    dispEl.classList.remove(c); camEl.classList.remove(c);
+  });
+  document.getElementById('gesture-emoji').classList.remove('active');
+  document.getElementById('gesture-emoji').textContent = '🖐';
+  document.getElementById('gesture-name').textContent  = 'Mostre um gesto!';
+  document.getElementById('gesture-name').style.color  = 'var(--text)';
+  document.getElementById('gesture-conf').textContent  = '';
+}
+
+/* ── HISTORY ── */
+function addHistory(emoji) {
+  history.push(emoji);
+  if (history.length > MAX_HISTORY) history.shift();
+  const strip = document.getElementById('history-strip');
+  strip.innerHTML = '';
+  history.slice().reverse().forEach(e => {
+    const chip = document.createElement('span');
+    chip.className   = 'hist-chip';
+    chip.textContent = e;
+    strip.appendChild(chip);
+  });
+}
 </script>
 </body>
 </html>
