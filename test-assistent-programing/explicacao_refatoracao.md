@@ -246,3 +246,4 @@ A refatoração transformou código funcional mas obscuro em código **claro, ma
 - ✨ Expansão futura
 - 🧪 Testes unitários
 - 📚 Geração de documentação automática
+
