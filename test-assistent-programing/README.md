@@ -1,36 +1,71 @@
 # Testes com Assistente de Programação (IA)
 
-Este diretório contém uma série de experimentos e testes documentando o uso de Inteligência Artificial (IA) para auxiliar em tarefas de programação. O objetivo principal é demonstrar as capacidades da IA em diferentes cenários comuns de desenvolvimento de software, como explicação de código, refatoração, e depuração (debugging).
+## Descrição geral do projeto
 
-## Estrutura do Projeto
+Este projeto é um repositório focado em documentar experimentos e interações práticas utilizando Inteligência Artificial como assistente de programação (Pair Programmer). O objetivo principal é demonstrar as capacidades e o fluxo de trabalho de uma IA ao auxiliar em tarefas fundamentais do desenvolvimento de software.
 
-O projeto é composto por scripts em Python e documentos Markdown com explicações geradas a partir das interações com a IA.
-
-### 🐛 Depuração (Debugging)
-* **`debug.py`**: Um script Python intencionalmente criado com erros lógicos e de sintaxe (como uso incorreto de operadores, precedência e problemas com tipos) para testar a capacidade da IA de identificar e corrigir os bugs.
-* **`explicacao-debug.md`**: Documento contendo a explicação detalhada da IA sobre os erros encontrados no código de debug e como cada um deles foi solucionado/analisado.
-
-### ♻️ Refatoração de Código
-* **`refatoracao.py`**: Um script em Python simples que calcula estatísticas (total, média, máximo, mínimo) de uma lista de números. É utilizado como base para testes de refatoração, visando melhorar legibilidade, aplicar tipagem (Type Hints) e seguir boas práticas.
-* **`explicacao_refatoracao.md`**: Documento explicando as decisões tomadas durante o processo de refatoração do código.
-
-### 📖 Explicação e Criação de Código
-* **`num_primo.py`**: Script que verifica se um número fornecido pelo usuário é primo. Possui validações, documentação em padrão Google e boas práticas de estruturação.
-* **`explicacao_num_primo.md`**: A documentação profunda sobre a lógica matemática e de implementação por trás da verificação de números primos.
-
-## Como Utilizar
-
-Você pode explorar os arquivos individualmente para ver exemplos práticos de como a Inteligência Artificial pode agir como um assistente (Pair Programmer):
-
-1. **Para testar as lógicas em Python:**
-   Execute os scripts diretamente no terminal, por exemplo:
-   ```bash
-   python num_primo.py
-   python refatoracao.py
-   python debug.py
-   ```
-2. **Para ler as análises:**
-   Abra os arquivos `.md` (Markdown) para visualizar as anotações, as explicações lógicas de decisões e as etapas documentadas de como a IA pensou ao resolver as tarefas.
+Através deste repositório, exploramos três áreas vitais:
+1. **Depuração e Correção de Bugs (Debugging)**: Avaliação de como a IA encontra, explica e corrige problemas sintáticos, lógicos e regras de negócio complexas.
+2. **Refatoração de Código**: Melhoria contínua de código funcional para adequação a boas práticas, Clean Code e tipagem (Type Hints).
+3. **Criação e Documentação**: Geração de lógicas do zero acompanhadas da construção estruturada de explicações matemáticas e de documentação padronizada (padrão Google).
 
 ---
-*Este repositório serve como material de estudo sobre Pair Programming com IAs, reforçando o desenvolvimento de prompts eficientes e revisão de código auxiliada por inteligência artificial.*
+
+## Estrutura de arquivos do repositório
+
+O repositório é composto por scripts Python executáveis e arquivos Markdown que contêm a documentação detalhada gerada a partir das explicações da IA.
+
+* **`README.md`**: Este arquivo principal de documentação.
+
+### 🐛 Depuração (Debugging)
+* **`debug.py`**: Script que originalmente possuía erros lógicos e de sintaxe (como uso incorreto de operadores e precedência) para testes. Atualmente, ele contém o **código corrigido** e validado, incluindo **comentários inline** detalhando passo a passo as decisões lógicas.
+* **`explicacao-debug.md`**: Documento com a explicação teórica fornecida pela IA sobre os problemas originais do código de debug e como cada um deles foi analisado e corrigido.
+
+### ♻️ Refatoração de Código
+* **`refatoracao.py`**: Um script simples em Python que calcula estatísticas básicas (total, média, máximo e mínimo) a partir de uma lista de números. O script foi refatorado para usar `Type Hints` rigorosos (`typing.Tuple`, `typing.List`) e seguir as melhores convenções.
+* **`explicacao_refatoracao.md`**: Documento que detalha as etapas e as boas práticas de desenvolvimento de software adotadas ao refatorar o código-fonte original.
+
+### 📖 Criação e Lógica Matemática
+* **`num_primo.py`**: Script que interage com o usuário e valida se um número digitado é um número primo. Possui validações de entrada, testes de borda, otimizações matemáticas (testando divisores apenas até a raiz quadrada) e uma docstring rica no padrão do Google.
+* **`explicacao_num_primo.md`**: Documento profundo e descritivo que traduz o algoritmo desenvolvido e os princípios matemáticos para a verificação de números primos.
+
+---
+
+## Instruções de como executar cada script
+
+Certifique-se de estar com o terminal aberto na pasta do projeto (`test-assistent-programing`). 
+
+### Executando `num_primo.py`
+Este script interage com o usuário solicitando um número para checagem.
+```bash
+python num_primo.py
+```
+* **O que esperar**: Um prompt será exibido no terminal pedindo um número. O programa fará o cálculo e retornará se o número é primo ou não de forma estruturada.
+
+### Executando `refatoracao.py`
+Este script não requer inputs externos, as entradas já estão definidas em código.
+```bash
+python refatoracao.py
+```
+* **O que esperar**: Ele irá calcular instantaneamente as estatísticas (total, média, maior e menor) para a lista de números em memória e exibirá os resultados de forma formatada.
+
+### Executando `debug.py`
+Assim como a refatoração, as variáveis deste script são fixas.
+```bash
+python debug.py
+```
+* **O que esperar**: O script rodará por vários blocos de testes unitários simples no console e imprimirá os resultados com base nos fluxos agora corrigidos (ex: cálculo de horas/minutos, regras de aprovação e de aposentadoria, cálculo de raízes e paridade).
+
+---
+
+## Tecnologias e ferramentas utilizadas
+
+* **Linguagem Principal**: Python 3.x
+* **Conceitos Essenciais**:
+  * Type Hints (módulo `typing`)
+  * Tratamento de Exceções (`try/except`)
+  * Otimização Matemática (`math.sqrt`)
+  * Operadores Booleanos (`and`, `or`, `not`)
+* **Documentação**: Markdown (`.md`)
+* **Padrões Adotados**: Docstrings no estilo Google, convenções de código limpo (Clean Code).
+* **Auxílio Computacional**: Assistentes de IA para geração de documentação, refatoração e debbuging automatizado de erros intencionais.
