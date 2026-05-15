@@ -1,0 +1,30 @@
+.fab-button {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  background-color: var(--primary-color);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(94, 106, 210, 0.4);
+  z-index: 900;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.fab-button:hover {
+  background-color: var(--primary-hover);
+  box-shadow: 0 6px 20px rgba(94, 106, 210, 0.5);
+}
+
+@media (max-width: 768px) {
+  .fab-button {
+    bottom: 24px;
+    right: 24px;
+  }
+}

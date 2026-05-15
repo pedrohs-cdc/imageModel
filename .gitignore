@@ -1,0 +1,16 @@
+node_modules/
+.env
+dist/
+build/
+*.log
+.DS_Store
+.antigravity/
+.gemini/
+.agent/
+.shared/
+.vscode/
+.idea/
+vendor/
+*.db
+*.db-shm
+*.db-wal
